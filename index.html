@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alchemy Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f0f8ff;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .game-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        .elements {
+            margin-right: 20px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            width: 200px;
+            background-color: #fff;
+            border-radius: 8px;
+        }
+        .element {
+            margin: 10px;
+            padding: 10px;
+            cursor: grab;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #e0f7fa;
+        }
+        .workspace {
+            width: 300px;
+            height: 300px;
+            border: 2px dashed #aaa;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .workspace .element {
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Alchemy Game</h1>
+    <div class="game-container">
+        <!-- Initial Elements List -->
+        <div id="elements" class="elements">
+            <div class="element" draggable="true" data-element="fire" ondragstart="drag(event)">🔥 Fire</div>
+            <div class="element" draggable="true" data-element="water" ondragstart="drag(event)">💧 Water</div>
+            <div class="element" draggable="true" data-element="earth" ondragstart="drag(event)">🌍 Earth</div>
+            <div class="element" draggable="true" data-element="air" ondragstart="drag(event)">🌬️ Air</div>
+        </div>
+        <!-- Workspace for Combining Elements -->
+        <div id="workspace" class="workspace" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <p>Drag elements here to combine</p>
+        </div>
+    </div>
+
+    <script>
+        // Define initial elements
+        const elements = {
+            "fire": "🔥",
+            "water": "💧",
+            "earth": "🌍",
+            "air": "🌬️"
+        };
+
+        // Define combinations
+        const combinations = {
+            "fire+water": "steam",
+            "fire+earth": "lava",
+            "water+earth": "mud",
+            "air+earth": "dust",
+            "air+fire": "energy",
+            "air+water": "rain"
+        };
+
+        // Allow elements to be dropped in the workspace
+        function allowDrop(event) {
+            event.preventDefault();
+        }
+
+        // Handle the dragging of an element
+        function drag(event) {
+            event.dataTransfer.setData("element", event.target.dataset.element);
+        }
+
+        // Handle dropping elements into the workspace
+        function drop(event) {
+            event.preventDefault();
+            const element1 = event.dataTransfer.getData("element");
+            const element2 = event.target.dataset.element;
+
+            // Check if there are two elements to combine
+            if (element1 && element2 && element1 !== element2) {
+                const combination = `${element1}+${element2}`;
+                const reverseCombination = `${element2}+${element1}`;
+                const result = combinations[combination] || combinations[reverseCombination];
+
+                if (result) {
+                    alert(`You created: ${result}!`);
+                } else {
+                    alert("Combination does not work.");
+                }
+            } else {
+                // Add the dragged element to the workspace if no combination is possible
+                const elementSymbol = elements[element1];
+                if (elementSymbol) {
+                    const newElement = document.createElement("div");
+                    newElement.className = "element";
+                    newElement.textContent = elementSymbol;
+                    newElement.dataset.element = element1;
+                    newElement.draggable = true;
+                    newElement.ondragstart = drag;
+                    event.target.appendChild(newElement);
+                }
+            }
+        }
+
+        // Attach drag events to initial elements
+        document.querySelectorAll(".element").forEach(el => {
+            el.ondragstart = drag;
+        });
+    </script>
+</body>
+</html>
